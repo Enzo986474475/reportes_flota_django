@@ -51,17 +51,23 @@ def inicio(request):
     else:
         antig_incumplimiento = 0
 
+
+
     if "Gestión Final" in df_tabla.columns:
-        serie_gestion = df_tabla["Gestión Final"].astype(str).str.strip()
-        placas_los_andes = serie_gestion.str.contains("los andes", case=False, na=False).sum()
-        placas_operaciones = serie_gestion.str.contains("operaciones", case=False, na=False).sum()
+        serie_gestion = df_tabla["Gestión Final"].astype(str).str.strip().str.upper()
+
+        placas_los_andes = (serie_gestion == "LOS ANDES").sum()
+        placas_operaciones = (serie_gestion == "OPERACIONES").sum()
     else:
         placas_los_andes = 0
         placas_operaciones = 0
 
+    total_reportado = placas_los_andes + placas_operaciones
+
     resumen_fuentes = [
         {"fuente": "Los Andes", "n_placas": int(placas_los_andes)},
         {"fuente": "Operaciones Tecsur", "n_placas": int(placas_operaciones)},
+        {"fuente": "Total Reportado (sin depurar)", "n_placas": int(total_reportado)},
     ]
 
     contexto = {

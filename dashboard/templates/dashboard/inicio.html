@@ -151,11 +151,12 @@
                         </tr>
                     </thead>
                     <tbody>
+
                         {% for fila in resumen_fuentes %}
-                            <tr>
-                                <td>{{ fila.fuente }}</td>
-                                <td>{{ fila.n_placas }}</td>
-                            </tr>
+                        <tr {% if "Total" in fila.fuente %}style="font-weight: bold; background-color: #e8f5f3;"{% endif %}>
+                            <td>{{ fila.fuente }}</td>
+                            <td>{{ fila.n_placas }}</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
