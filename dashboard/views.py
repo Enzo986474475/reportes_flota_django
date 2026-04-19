@@ -1,23 +1,21 @@
 from django.shortcuts import render
 from pathlib import Path
 
-from .services.lectores_excel import (
-    leer_hoja_flota,
-    leer_hoja_flota_maestro,
-)
+from .services.lectores_excel import leer_hoja_flota_maestro
 
 
 def inicio(request):
     base_dir = Path(__file__).resolve().parent.parent
 
-    df_flota = leer_hoja_flota(base_dir)
+    # Por ahora trabajaremos solo con Flota_Maestro
     df_flota_maestro = leer_hoja_flota_maestro(base_dir)
 
-    total_vehiculos = len(df_flota)
+    total_vehiculos = len(df_flota_maestro)
 
-    if "Antiguamiento" in df_flota.columns:
+    # KPI de incumplimientos
+    if "Antiguamiento" in df_flota_maestro.columns:
         antig_incumplimiento = (
-            df_flota["Antiguamiento"]
+            df_flota_maestro["Antiguamiento"]
             .astype(str)
             .str.strip()
             .str.lower()
@@ -50,7 +48,7 @@ def inicio(request):
         "Usuario Final",    # AG
     ]
 
-    # eliminar columnas basura tipo "Sin nombre"
+    # quitar columnas basura tipo "Sin nombre"
     df_tabla = df_tabla.loc[:, ~df_tabla.columns.str.contains("Sin nombre", case=False, na=False)]
 
     # convertir columnas numéricas float a enteros cuando corresponda
@@ -58,7 +56,7 @@ def inicio(request):
         if df_tabla[col].dtype == float:
             df_tabla[col] = df_tabla[col].fillna(0).astype(int)
 
-    # resumen por fuente usando Gestión Final
+    # Primer cuadro: Flota reportada por cada fuente
     if "Gestión Final" in df_tabla.columns:
         serie_gestion = df_tabla["Gestión Final"].astype(str).str.strip()
 
@@ -76,7 +74,6 @@ def inicio(request):
     contexto = {
         "total_vehiculos": total_vehiculos,
         "antig_incumplimiento": antig_incumplimiento,
-
         "resumen_fuentes": resumen_fuentes,
 
         # por si luego los usamos
@@ -84,7 +81,8 @@ def inicio(request):
         "registros": df_tabla.head(20).to_dict(orient="records"),
         "total_registros": len(df_tabla),
 
-        "total_registros_flota": len(df_flota),
+        # por ahora no estamos leyendo la hoja Flota
+        "total_registros_flota": 0,
         "total_registros_flota_maestro": len(df_flota_maestro),
     }
 
