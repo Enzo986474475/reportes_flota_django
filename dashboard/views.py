@@ -50,18 +50,38 @@ def inicio(request):
         "Usuario Final",    # AG
     ]
 
+
+    # resumen por fuente usando la columna Gestión Final
+    if "Gestión Final" in df_tabla.columns:
+        serie_gestion = df_tabla["Gestión Final"].astype(str).str.strip()
+
+        placas_los_andes = serie_gestion.str.contains("los andes", case=False, na=False).sum()
+        placas_operaciones = serie_gestion.str.contains("operaciones", case=False, na=False).sum()
+    else:
+        placas_los_andes = 0
+        placas_operaciones = 0
+
+    resumen_fuentes = [
+        {"fuente": "Los Andes", "n_placas": int(placas_los_andes)},
+        {"fuente": "Operaciones Tecsur", "n_placas": int(placas_operaciones)},
+    ]
+
     contexto = {
         "total_vehiculos": total_vehiculos,
         "antig_incumplimiento": antig_incumplimiento,
 
-        # tabla principal
+        # nuevo cuadro resumen
+        "resumen_fuentes": resumen_fuentes,
+
+        # por si luego los usamos
         "columnas": df_tabla.columns.tolist(),
         "registros": df_tabla.head(20).to_dict(orient="records"),
         "total_registros": len(df_tabla),
 
-        # validación opcional
         "total_registros_flota": len(df_flota),
         "total_registros_flota_maestro": len(df_flota_maestro),
     }
+
+
 
     return render(request, "dashboard/inicio.html", contexto)

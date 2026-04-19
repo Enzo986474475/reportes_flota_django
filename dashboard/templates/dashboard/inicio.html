@@ -97,6 +97,10 @@
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
+        .resumen-tabla {
+            max-width: 500px;
+        }
     </style>
 </head>
 <body>
@@ -125,11 +129,6 @@
             </div>
         </div>
 
-
-
-
-
-
         <div class="section">
             <h2>Bienvenido</h2>
             <p>
@@ -145,32 +144,27 @@
             <p><strong>Hoja Flota_Maestro:</strong> {{ total_registros_flota_maestro }} registros</p>
         </div>
 
-
-
-
-
         <div class="section">
-            <h2>Datos de Flota (Excel)</h2>
-            <p>Total de registros: {{ total_registros }}</p>
+            <h2>Flota Reportada por cada Fuente</h2>
 
-            <table>
-                <thead>
-                    <tr>
-                        {% for col in columnas %}
-                            <th>{{ col }}</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for fila in registros %}
+            <div class="resumen-tabla">
+                <table>
+                    <thead>
                         <tr>
-                            {% for col in columnas %}
-                                <td>{{ fila|get_item:col }}</td>
-                            {% endfor %}
+                            <th>Fuente</th>
+                            <th>N° Placas</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for fila in resumen_fuentes %}
+                            <tr>
+                                <td>{{ fila.fuente }}</td>
+                                <td>{{ fila.n_placas }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
