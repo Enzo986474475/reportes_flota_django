@@ -4,47 +4,35 @@ from pathlib import Path
 from .services.lectores_excel import leer_hoja_flota_maestro
 
 
+def buscar_columna(df, candidatos):
+    columnas_limpias = {str(col).strip().lower(): col for col in df.columns}
+
+    for candidato in candidatos:
+        clave = candidato.strip().lower()
+        if clave in columnas_limpias:
+            return columnas_limpias[clave]
+
+    return None
+
+
 def inicio(request):
     base_dir = Path(__file__).resolve().parent.parent
 
-    df_flota_maestro = leer_hoja_flota_maestro(base_dir)
+    df_flota_maestro = leer_hoja_flota_maestro(base_dir).copy()
+    df_flota_maestro.columns = [str(col).strip() for col in df_flota_maestro.columns]
 
     total_vehiculos = len(df_flota_maestro)
 
-    # Posiciones relativas en Flota_Maestro leyendo desde columna C:
-    # E=2, G=4, H=5, L=9, P=13, Q=14, R=15, S=16, V=19, X=21, Y=22, Z=23, AA=24, AG=30
-    columnas_idx = [2, 5, 9, 13, 14, 15, 16, 19, 4, 21, 22, 23, 24, 30]
+    # Buscar columnas reales del Excel por nombre
+    col_antiguamiento = buscar_columna(df_flota_maestro, ["Antiguamiento"])
+    col_gestion_final = buscar_columna(df_flota_maestro, ["Gestión Final", "Gestion Final"])
+    col_origen = buscar_columna(df_flota_maestro, ["Origen"])
 
-    df_tabla = df_flota_maestro.iloc[:, columnas_idx].copy()
-
-    df_tabla.columns = [
-        "Placa Vehiculo",
-        "Tipo",
-        "Año",
-        "Propietario",
-        "Gestión Ope",
-        "Gestión LA",
-        "Gestión Final",
-        "Antiguedad",
-        "Grupo",
-        "Clase",
-        "Antiguamiento",
-        "Criterio de Ant.",
-        "Origen",
-        "Usuario Final",
-    ]
-
-    df_tabla = df_tabla.loc[
-        :, ~df_tabla.columns.str.contains("Sin nombre", case=False, na=False)
-    ]
-
-    for col in df_tabla.columns:
-        if df_tabla[col].dtype == float:
-            df_tabla[col] = df_tabla[col].fillna(0).astype(int)
-
-    if "Antiguamiento" in df_tabla.columns:
+    # KPI Antiguamiento
+    if col_antiguamiento:
         antig_incumplimiento = (
-            df_tabla["Antiguamiento"]
+            df_flota_maestro[col_antiguamiento]
+            .fillna("")
             .astype(str)
             .str.strip()
             .str.lower()
@@ -54,10 +42,10 @@ def inicio(request):
     else:
         antig_incumplimiento = 0
 
-    # Los Andes desde Gestión Final
-    if "Gestión Final" in df_tabla.columns:
+    # Resumen por fuente
+    if col_gestion_final:
         serie_gestion_final = (
-            df_tabla["Gestión Final"]
+            df_flota_maestro[col_gestion_final]
             .fillna("")
             .astype(str)
             .str.strip()
@@ -67,10 +55,9 @@ def inicio(request):
     else:
         placas_los_andes = 0
 
-    # Operaciones Tecsur desde Origen
-    if "Origen" in df_tabla.columns:
+    if col_origen:
         serie_origen = (
-            df_tabla["Origen"]
+            df_flota_maestro[col_origen]
             .fillna("")
             .astype(str)
             .str.strip()
@@ -89,8 +76,8 @@ def inicio(request):
     ]
 
     contexto = {
-        "total_vehiculos": total_vehiculos,
-        "antig_incumplimiento": antig_incumplimiento,
+        "total_vehiculos": int(total_vehiculos),
+        "antig_incumplimiento": int(antig_incumplimiento),
         "resumen_fuentes": resumen_fuentes,
     }
 
