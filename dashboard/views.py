@@ -33,7 +33,27 @@ def inicio(request):
         "Usuario Final",
     ]
 
+    print("COLUMNAS df_tabla:", df_tabla.columns.tolist())
+
+    print("MUESTRA Gestión Ope:")
+    print(df_tabla["Gestión Ope"].head(10).tolist())
+
+    print("MUESTRA Gestión LA:")
+    print(df_tabla["Gestión LA"].head(10).tolist())
+
+    print("MUESTRA Gestión Final:")
+    print(df_tabla["Gestión Final"].head(10).tolist())
+
+    gestion_ope = df_tabla["Gestión Ope"].fillna("").astype(str).str.strip().str.upper()
+    gestion_la = df_tabla["Gestión LA"].fillna("").astype(str).str.strip().str.upper()
+
+    print("UNIQUE Gestión Ope:", gestion_ope.unique()[:20])
+    print("UNIQUE Gestión LA:", gestion_la.unique()[:20])
+
+
     df_tabla = df_tabla.loc[:, ~df_tabla.columns.str.contains("Sin nombre", case=False, na=False)]
+
+
 
     for col in df_tabla.columns:
         if df_tabla[col].dtype == float:
