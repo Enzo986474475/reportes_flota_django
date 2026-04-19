@@ -1,0 +1,167 @@
+{% load dashboard_extras %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Flota Tecsur</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #1f2937;
+        }
+
+        .header {
+            background-color: #0b5e55;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .container {
+            padding: 30px 40px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            min-width: 220px;
+            flex: 1;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #0b5e55;
+        }
+
+        .section {
+            margin-top: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            background-color: #0b5e55;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background-color: #094943;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #dcdcdc;
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #0b5e55;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Reporte de Flota Tecsur</h1>
+        <p>Panel inicial de reportes de flota desarrollado con Django</p>
+    </div>
+
+    <div class="container">
+        <div class="cards">
+            <div class="card">
+                <h3>Total de vehículos</h3>
+                <p style="font-size: 32px; font-weight: bold; margin: 10px 0 0;">
+                    {{ total_vehiculos }}
+                </p>
+            </div>
+
+            <div class="card">
+                <h3>Antiguamiento</h3>
+                <p style="font-size: 32px; font-weight: bold; margin: 10px 0 0;">
+                    {{ antig_incumplimiento }}
+                </p>
+                <p style="margin-top: 8px; color: #555;">
+                    Incumplimientos detectados
+                </p>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="section">
+            <h2>Bienvenido</h2>
+            <p>
+                Esta será la página principal de tu sistema de reportes de flota.
+                Más adelante aquí mostraremos tablas, filtros, gráficos y KPIs reales.
+            </p>
+            <a href="#" class="btn">Próximamente: ver reportes</a>
+        </div>
+
+        <div class="section">
+            <h2>Datos de Flota (Excel)</h2>
+            <p>Total de registros: {{ total_registros }}</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        {% for col in columnas %}
+                            <th>{{ col }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fila in registros %}
+                        <tr>
+                            {% for col in columnas %}
+                                <td>{{ fila|get_item:col }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
