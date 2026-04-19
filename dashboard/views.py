@@ -50,8 +50,15 @@ def inicio(request):
         "Usuario Final",    # AG
     ]
 
+    # eliminar columnas basura tipo "Sin nombre"
+    df_tabla = df_tabla.loc[:, ~df_tabla.columns.str.contains("Sin nombre", case=False, na=False)]
 
-    # resumen por fuente usando la columna Gestión Final
+    # convertir columnas numéricas float a enteros cuando corresponda
+    for col in df_tabla.columns:
+        if df_tabla[col].dtype == float:
+            df_tabla[col] = df_tabla[col].fillna(0).astype(int)
+
+    # resumen por fuente usando Gestión Final
     if "Gestión Final" in df_tabla.columns:
         serie_gestion = df_tabla["Gestión Final"].astype(str).str.strip()
 
@@ -70,7 +77,6 @@ def inicio(request):
         "total_vehiculos": total_vehiculos,
         "antig_incumplimiento": antig_incumplimiento,
 
-        # nuevo cuadro resumen
         "resumen_fuentes": resumen_fuentes,
 
         # por si luego los usamos
@@ -81,7 +87,5 @@ def inicio(request):
         "total_registros_flota": len(df_flota),
         "total_registros_flota_maestro": len(df_flota_maestro),
     }
-
-
 
     return render(request, "dashboard/inicio.html", contexto)
