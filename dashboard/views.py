@@ -12,8 +12,8 @@ def inicio(request):
     total_vehiculos = len(df_flota_maestro)
 
     # Posiciones relativas en Flota_Maestro leyendo desde columna C:
-    # E=2, G=4, H=5, L=9, P=13, Q=14, R=15, S=16, V=19, X=21, Y=22, Z=23, AG=30
-    columnas_idx = [2, 5, 9, 13, 14, 15, 16, 19, 4, 21, 22, 23, 30]
+    # E=2, G=4, H=5, L=9, P=13, Q=14, R=15, S=16, V=19, X=21, Y=22, Z=23, AA=24, AG=30
+    columnas_idx = [2, 5, 9, 13, 14, 15, 16, 19, 4, 21, 22, 23, 24, 30]
 
     df_tabla = df_flota_maestro.iloc[:, columnas_idx].copy()
 
@@ -30,30 +30,13 @@ def inicio(request):
         "Clase",
         "Antiguamiento",
         "Criterio de Ant.",
+        "Origen",
         "Usuario Final",
     ]
 
-    print("COLUMNAS df_tabla:", df_tabla.columns.tolist())
-
-    print("MUESTRA Gestión Ope:")
-    print(df_tabla["Gestión Ope"].head(10).tolist())
-
-    print("MUESTRA Gestión LA:")
-    print(df_tabla["Gestión LA"].head(10).tolist())
-
-    print("MUESTRA Gestión Final:")
-    print(df_tabla["Gestión Final"].head(10).tolist())
-
-    gestion_ope = df_tabla["Gestión Ope"].fillna("").astype(str).str.strip().str.upper()
-    gestion_la = df_tabla["Gestión LA"].fillna("").astype(str).str.strip().str.upper()
-
-    print("UNIQUE Gestión Ope:", gestion_ope.unique()[:20])
-    print("UNIQUE Gestión LA:", gestion_la.unique()[:20])
-
-
-    df_tabla = df_tabla.loc[:, ~df_tabla.columns.str.contains("Sin nombre", case=False, na=False)]
-
-
+    df_tabla = df_tabla.loc[
+        :, ~df_tabla.columns.str.contains("Sin nombre", case=False, na=False)
+    ]
 
     for col in df_tabla.columns:
         if df_tabla[col].dtype == float:
@@ -71,20 +54,30 @@ def inicio(request):
     else:
         antig_incumplimiento = 0
 
-
-
+    # Los Andes desde Gestión Final
     if "Gestión Final" in df_tabla.columns:
-        serie_gestion = (
+        serie_gestion_final = (
             df_tabla["Gestión Final"]
+            .fillna("")
             .astype(str)
             .str.strip()
             .str.upper()
         )
-
-        placas_los_andes = (serie_gestion == "LOS ANDES").sum()
-        placas_operaciones = (serie_gestion == "OPERACIONES").sum()
+        placas_los_andes = (serie_gestion_final == "LOS ANDES").sum()
     else:
         placas_los_andes = 0
+
+    # Operaciones Tecsur desde Origen
+    if "Origen" in df_tabla.columns:
+        serie_origen = (
+            df_tabla["Origen"]
+            .fillna("")
+            .astype(str)
+            .str.strip()
+            .str.upper()
+        )
+        placas_operaciones = (serie_origen == "OPERACIONES").sum()
+    else:
         placas_operaciones = 0
 
     total_reportado = placas_los_andes + placas_operaciones
@@ -99,7 +92,6 @@ def inicio(request):
         "total_vehiculos": total_vehiculos,
         "antig_incumplimiento": antig_incumplimiento,
         "resumen_fuentes": resumen_fuentes,
-        "total_registros_flota_maestro": len(df_flota_maestro),
     }
 
     return render(request, "dashboard/inicio.html", contexto)
