@@ -14,12 +14,10 @@ def leer_hoja_flota(base_dir: Path) -> pd.DataFrame:
     df = pd.read_excel(
         archivo,
         sheet_name="Flota",
-        header=7,   # fila 8 en Excel
+        header=7
     )
 
-    # cortar desde columna C en adelante
-    df = df.iloc[:, 2:].copy()
-
+    df = df.iloc[:, 2:].copy()   # desde columna C
     df = limpiar_columnas(df)
     return df
 
@@ -30,11 +28,9 @@ def leer_hoja_flota_maestro(base_dir: Path) -> pd.DataFrame:
     df = pd.read_excel(
         archivo,
         sheet_name="Flota_Maestro",
-        header=4,   # fila 5 en Excel
+        header=4
     )
 
-    # cortar desde columna C en adelante
-    df = df.iloc[:, 2:].copy()
-
+    df = df.iloc[:, 2:].copy()   # desde columna C
     df = limpiar_columnas(df)
     return df
