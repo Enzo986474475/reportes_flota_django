@@ -8,6 +8,7 @@ def limpiar_columnas(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+
 def leer_hoja_flota(base_dir: Path) -> pd.DataFrame:
     archivo = base_dir / "data" / "Control-de-Flota-Vehicular-Tecsur 12.xlsx"
 
@@ -17,8 +18,14 @@ def leer_hoja_flota(base_dir: Path) -> pd.DataFrame:
         header=7
     )
 
-    df = df.iloc[:, 2:].copy()   # desde columna C
+    # IMPORTANTE: eliminar columnas vacías a la derecha
+    df = df.loc[:, ~df.columns.astype(str).str.contains("^Unnamed")]
+
+    # cortar desde columna C
+    df = df.iloc[:, 2:].copy()
+
     df = limpiar_columnas(df)
+
     return df
 
 
