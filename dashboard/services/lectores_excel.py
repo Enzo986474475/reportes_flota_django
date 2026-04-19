@@ -27,10 +27,13 @@ def leer_hoja_flota_maestro(base_dir: Path) -> pd.DataFrame:
     if hoja_objetivo is None:
         raise ValueError(f"No se encontró una hoja equivalente a 'Flota_Maestro'. Hojas disponibles: {hojas}")
 
+
     df = pd.read_excel(
         archivo,
         sheet_name=hoja_objetivo,
-        header=4
+        header=4,
+        engine="openpyxl",
+        engine_kwargs={"data_only": True},
     )
 
     df = df.loc[:, ~df.columns.astype(str).str.contains("^Unnamed", na=False)]

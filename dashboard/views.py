@@ -54,7 +54,12 @@ def inicio(request):
 
 
     if "Gestión Final" in df_tabla.columns:
-        serie_gestion = df_tabla["Gestión Final"].astype(str).str.strip().str.upper()
+        serie_gestion = (
+            df_tabla["Gestión Final"]
+            .astype(str)
+            .str.strip()
+            .str.upper()
+        )
 
         placas_los_andes = (serie_gestion == "LOS ANDES").sum()
         placas_operaciones = (serie_gestion == "OPERACIONES").sum()
